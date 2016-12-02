@@ -69,11 +69,11 @@ Writing parser...
 [32] expr ::= LET declarationList IN exprSeq END 
 [33] expr ::= LET declarationList IN END 
 [34] exprSeq ::= expr 
-[35] exprSeq ::= exprSeq SEMICOLON expr 
+[35] exprSeq ::= expr SEMICOLON exprSeq 
 [36] exprList ::= expr 
-[37] exprList ::= exprList COMMA expr 
+[37] exprList ::= expr COMMA exprList 
 [38] fieldList ::= ID EQ expr 
-[39] fieldList ::= fieldList COMMA ID EQ expr 
+[39] fieldList ::= ID EQ expr COMMA fieldList 
 [40] lvalue ::= ID 
 [41] lvalue ::= lvalue DOT ID 
 [42] lvalue ::= lvalue LBRACK expr RBRACK 
@@ -91,7 +91,7 @@ Writing parser...
 [54] type ::= LBRACE RBRACE 
 [55] type ::= ARRAY OF ID 
 [56] typeFields ::= ID COLON ID 
-[57] typeFields ::= typeFields COMMA ID COLON ID 
+[57] typeFields ::= ID COLON ID COMMA typeFields 
 [58] variableDeclaration ::= VAR ID ASSIGN expr 
 [59] variableDeclaration ::= VAR ID COLON ID ASSIGN expr 
 [60] functionDeclarationList ::= functionDeclaration 
@@ -201,7 +201,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [150]
+transition on expr to state [146]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -260,7 +260,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [147]
+transition on expr to state [143]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -274,7 +274,7 @@ transition on MINUS to state [1]
 lalr_state [4]: {
   [expr ::= FOR (*) ID ASSIGN expr TO expr DO expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
-transition on ID to state [140]
+transition on ID to state [136]
 
 -------------------
 lalr_state [5]: {
@@ -285,7 +285,7 @@ lalr_state [5]: {
 lalr_state [6]: {
   [$START ::= program (*) EOF , {EOF }]
 }
-transition on EOF to state [139]
+transition on EOF to state [135]
 
 -------------------
 lalr_state [7]: {
@@ -337,7 +337,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [134]
+transition on expr to state [130]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -357,9 +357,9 @@ lalr_state [9]: {
   [expr ::= ID (*) LPAREN exprList RPAREN , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= ID (*) LBRACE RBRACE , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
-transition on LPAREN to state [113]
-transition on LBRACK to state [112]
-transition on LBRACE to state [111]
+transition on LPAREN to state [111]
+transition on LBRACK to state [110]
+transition on LBRACE to state [109]
 
 -------------------
 lalr_state [10]: {
@@ -443,7 +443,7 @@ lalr_state [12]: {
   [expr ::= (*) expr OR expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) STRING , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [lvalue ::= (*) ID LBRACK expr RBRACK , {SEMICOLON RPAREN LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
-  [exprSeq ::= (*) expr , {SEMICOLON RPAREN }]
+  [exprSeq ::= (*) expr , {RPAREN }]
   [expr ::= (*) ID LBRACE RBRACE , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr LE expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr PLUS expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
@@ -451,7 +451,7 @@ lalr_state [12]: {
   [expr ::= (*) ID LPAREN RPAREN , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr AND expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) INT , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [exprSeq ::= (*) exprSeq SEMICOLON expr , {SEMICOLON RPAREN }]
+  [exprSeq ::= (*) expr SEMICOLON exprSeq , {RPAREN }]
   [expr ::= (*) ID LBRACK expr RBRACK OF expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr GT expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr MINUS expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
@@ -1678,11 +1678,9 @@ lalr_state [45]: {
 
 -------------------
 lalr_state [46]: {
-  [exprSeq ::= exprSeq (*) SEMICOLON expr , {SEMICOLON RPAREN }]
   [expr ::= LPAREN exprSeq (*) RPAREN , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
-transition on SEMICOLON to state [50]
-transition on RPAREN to state [49]
+transition on RPAREN to state [51]
 
 -------------------
 lalr_state [47]: {
@@ -1694,7 +1692,7 @@ lalr_state [48]: {
   [expr ::= expr (*) GT expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= expr (*) NEQ expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= expr (*) OR expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [exprSeq ::= expr (*) , {SEMICOLON RPAREN END }]
+  [exprSeq ::= expr (*) , {RPAREN END }]
   [expr ::= expr (*) MINUS expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= expr (*) LE expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= expr (*) EQ expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
@@ -1702,12 +1700,14 @@ lalr_state [48]: {
   [expr ::= expr (*) PLUS expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= expr (*) GE expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= expr (*) LT expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
+  [exprSeq ::= expr (*) SEMICOLON exprSeq , {RPAREN END }]
   [expr ::= expr (*) AND expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= expr (*) TIMES expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
 }
 transition on OR to state [30]
 transition on LT to state [29]
 transition on TIMES to state [28]
+transition on SEMICOLON to state [49]
 transition on GT to state [27]
 transition on LE to state [26]
 transition on EQ to state [25]
@@ -1720,11 +1720,6 @@ transition on AND to state [19]
 
 -------------------
 lalr_state [49]: {
-  [expr ::= LPAREN exprSeq RPAREN (*) , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
-}
-
--------------------
-lalr_state [50]: {
   [lvalue ::= (*) lvalue DOT ID , {SEMICOLON RPAREN LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN END }]
   [expr ::= (*) LET declarationList IN exprSeq END , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) LPAREN RPAREN , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
@@ -1743,6 +1738,7 @@ lalr_state [50]: {
   [expr ::= (*) expr OR expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) STRING , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [lvalue ::= (*) ID LBRACK expr RBRACK , {SEMICOLON RPAREN LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN END }]
+  [exprSeq ::= (*) expr , {RPAREN END }]
   [expr ::= (*) ID LBRACE RBRACE , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) expr LE expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) expr PLUS expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
@@ -1750,7 +1746,8 @@ lalr_state [50]: {
   [expr ::= (*) ID LPAREN RPAREN , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) expr AND expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) INT , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [exprSeq ::= exprSeq SEMICOLON (*) expr , {SEMICOLON RPAREN END }]
+  [exprSeq ::= expr SEMICOLON (*) exprSeq , {RPAREN END }]
+  [exprSeq ::= (*) expr SEMICOLON exprSeq , {RPAREN END }]
   [expr ::= (*) ID LBRACK expr RBRACK OF expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) expr GT expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) expr MINUS expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
@@ -1767,51 +1764,33 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [51]
+transition on expr to state [48]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
 transition on NIL to state [5]
 transition on FOR to state [4]
+transition on exprSeq to state [50]
 transition on WHILE to state [3]
 transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [51]: {
-  [expr ::= expr (*) GT expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [expr ::= expr (*) NEQ expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [expr ::= expr (*) OR expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [expr ::= expr (*) MINUS expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [expr ::= expr (*) LE expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [expr ::= expr (*) EQ expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [expr ::= expr (*) DIVIDE expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [expr ::= expr (*) PLUS expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [expr ::= expr (*) GE expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [exprSeq ::= exprSeq SEMICOLON expr (*) , {SEMICOLON RPAREN END }]
-  [expr ::= expr (*) LT expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [expr ::= expr (*) AND expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [expr ::= expr (*) TIMES expr , {SEMICOLON RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
+lalr_state [50]: {
+  [exprSeq ::= expr SEMICOLON exprSeq (*) , {RPAREN END }]
 }
-transition on OR to state [30]
-transition on LT to state [29]
-transition on TIMES to state [28]
-transition on GT to state [27]
-transition on LE to state [26]
-transition on EQ to state [25]
-transition on PLUS to state [24]
-transition on NEQ to state [23]
-transition on GE to state [22]
-transition on DIVIDE to state [21]
-transition on MINUS to state [20]
-transition on AND to state [19]
+
+-------------------
+lalr_state [51]: {
+  [expr ::= LPAREN exprSeq RPAREN (*) , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
+}
 
 -------------------
 lalr_state [52]: {
   [expr ::= LET declarationList (*) IN exprSeq END , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= LET declarationList (*) IN END , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
-transition on IN to state [107]
+transition on IN to state [105]
 
 -------------------
 lalr_state [53]: {
@@ -1822,7 +1801,7 @@ lalr_state [53]: {
   [typeDeclarationList ::= (*) typeDeclaration typeDeclarationList , {IN FUNCTION VAR TYPE }]
 }
 transition on TYPE to state [59]
-transition on typeDeclarationList to state [106]
+transition on typeDeclarationList to state [104]
 transition on typeDeclaration to state [53]
 
 -------------------
@@ -1855,7 +1834,7 @@ transition on functionDeclaration to state [56]
 transition on variableDeclaration to state [55]
 transition on declaration to state [54]
 transition on typeDeclaration to state [53]
-transition on declarationList to state [105]
+transition on declarationList to state [103]
 
 -------------------
 lalr_state [55]: {
@@ -1875,7 +1854,7 @@ lalr_state [56]: {
 }
 transition on FUNCTION to state [60]
 transition on functionDeclaration to state [56]
-transition on functionDeclarationList to state [104]
+transition on functionDeclarationList to state [102]
 
 -------------------
 lalr_state [57]: {
@@ -1887,13 +1866,13 @@ lalr_state [58]: {
   [variableDeclaration ::= VAR (*) ID COLON ID ASSIGN expr , {IN FUNCTION VAR TYPE }]
   [variableDeclaration ::= VAR (*) ID ASSIGN expr , {IN FUNCTION VAR TYPE }]
 }
-transition on ID to state [97]
+transition on ID to state [95]
 
 -------------------
 lalr_state [59]: {
   [typeDeclaration ::= TYPE (*) ID EQ type , {IN FUNCTION VAR TYPE }]
 }
-transition on ID to state [86]
+transition on ID to state [84]
 
 -------------------
 lalr_state [60]: {
@@ -1922,9 +1901,9 @@ transition on LPAREN to state [63]
 lalr_state [63]: {
   [functionDeclaration ::= FUNCTION ID LPAREN (*) RPAREN COLON ID EQ expr , {IN FUNCTION VAR TYPE }]
   [functionDeclaration ::= FUNCTION ID LPAREN (*) typeFields RPAREN EQ expr , {IN FUNCTION VAR TYPE }]
-  [typeFields ::= (*) typeFields COMMA ID COLON ID , {COMMA RPAREN }]
+  [typeFields ::= (*) ID COLON ID COMMA typeFields , {RPAREN }]
   [functionDeclaration ::= FUNCTION ID LPAREN (*) typeFields RPAREN COLON ID EQ expr , {IN FUNCTION VAR TYPE }]
-  [typeFields ::= (*) ID COLON ID , {COMMA RPAREN }]
+  [typeFields ::= (*) ID COLON ID , {RPAREN }]
   [functionDeclaration ::= FUNCTION ID LPAREN (*) RPAREN EQ expr , {IN FUNCTION VAR TYPE }]
 }
 transition on RPAREN to state [66]
@@ -1933,18 +1912,17 @@ transition on ID to state [64]
 
 -------------------
 lalr_state [64]: {
-  [typeFields ::= ID (*) COLON ID , {COMMA RPAREN RBRACE }]
+  [typeFields ::= ID (*) COLON ID COMMA typeFields , {RPAREN RBRACE }]
+  [typeFields ::= ID (*) COLON ID , {RPAREN RBRACE }]
 }
-transition on COLON to state [84]
+transition on COLON to state [80]
 
 -------------------
 lalr_state [65]: {
   [functionDeclaration ::= FUNCTION ID LPAREN typeFields (*) RPAREN EQ expr , {IN FUNCTION VAR TYPE }]
-  [typeFields ::= typeFields (*) COMMA ID COLON ID , {COMMA RPAREN }]
   [functionDeclaration ::= FUNCTION ID LPAREN typeFields (*) RPAREN COLON ID EQ expr , {IN FUNCTION VAR TYPE }]
 }
-transition on RPAREN to state [74]
-transition on COMMA to state [73]
+transition on RPAREN to state [73]
 
 -------------------
 lalr_state [66]: {
@@ -2134,20 +2112,14 @@ transition on AND to state [19]
 
 -------------------
 lalr_state [73]: {
-  [typeFields ::= typeFields COMMA (*) ID COLON ID , {COMMA RPAREN RBRACE }]
-}
-transition on ID to state [81]
-
--------------------
-lalr_state [74]: {
   [functionDeclaration ::= FUNCTION ID LPAREN typeFields RPAREN (*) COLON ID EQ expr , {IN FUNCTION VAR TYPE }]
   [functionDeclaration ::= FUNCTION ID LPAREN typeFields RPAREN (*) EQ expr , {IN FUNCTION VAR TYPE }]
 }
-transition on COLON to state [76]
-transition on EQ to state [75]
+transition on COLON to state [75]
+transition on EQ to state [74]
 
 -------------------
-lalr_state [75]: {
+lalr_state [74]: {
   [lvalue ::= (*) lvalue DOT ID , {LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN IN FUNCTION VAR TYPE }]
   [expr ::= (*) LET declarationList IN exprSeq END , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
   [expr ::= (*) LPAREN RPAREN , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
@@ -2190,7 +2162,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [80]
+transition on expr to state [79]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -2201,19 +2173,19 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [76]: {
+lalr_state [75]: {
   [functionDeclaration ::= FUNCTION ID LPAREN typeFields RPAREN COLON (*) ID EQ expr , {IN FUNCTION VAR TYPE }]
 }
-transition on ID to state [77]
+transition on ID to state [76]
+
+-------------------
+lalr_state [76]: {
+  [functionDeclaration ::= FUNCTION ID LPAREN typeFields RPAREN COLON ID (*) EQ expr , {IN FUNCTION VAR TYPE }]
+}
+transition on EQ to state [77]
 
 -------------------
 lalr_state [77]: {
-  [functionDeclaration ::= FUNCTION ID LPAREN typeFields RPAREN COLON ID (*) EQ expr , {IN FUNCTION VAR TYPE }]
-}
-transition on EQ to state [78]
-
--------------------
-lalr_state [78]: {
   [lvalue ::= (*) lvalue DOT ID , {LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN IN FUNCTION VAR TYPE }]
   [functionDeclaration ::= FUNCTION ID LPAREN typeFields RPAREN COLON ID EQ (*) expr , {IN FUNCTION VAR TYPE }]
   [expr ::= (*) LET declarationList IN exprSeq END , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
@@ -2256,7 +2228,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [79]
+transition on expr to state [78]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -2267,7 +2239,7 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [79]: {
+lalr_state [78]: {
   [expr ::= expr (*) GT expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
   [expr ::= expr (*) NEQ expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
   [expr ::= expr (*) OR expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
@@ -2296,7 +2268,7 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [80]: {
+lalr_state [79]: {
   [expr ::= expr (*) GT expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
   [expr ::= expr (*) NEQ expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
   [expr ::= expr (*) OR expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
@@ -2325,124 +2297,122 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [81]: {
-  [typeFields ::= typeFields COMMA ID (*) COLON ID , {COMMA RPAREN RBRACE }]
+lalr_state [80]: {
+  [typeFields ::= ID COLON (*) ID COMMA typeFields , {RPAREN RBRACE }]
+  [typeFields ::= ID COLON (*) ID , {RPAREN RBRACE }]
 }
-transition on COLON to state [82]
+transition on ID to state [81]
+
+-------------------
+lalr_state [81]: {
+  [typeFields ::= ID COLON ID (*) , {RPAREN RBRACE }]
+  [typeFields ::= ID COLON ID (*) COMMA typeFields , {RPAREN RBRACE }]
+}
+transition on COMMA to state [82]
 
 -------------------
 lalr_state [82]: {
-  [typeFields ::= typeFields COMMA ID COLON (*) ID , {COMMA RPAREN RBRACE }]
+  [typeFields ::= (*) ID COLON ID COMMA typeFields , {RPAREN RBRACE }]
+  [typeFields ::= (*) ID COLON ID , {RPAREN RBRACE }]
+  [typeFields ::= ID COLON ID COMMA (*) typeFields , {RPAREN RBRACE }]
 }
-transition on ID to state [83]
+transition on typeFields to state [83]
+transition on ID to state [64]
 
 -------------------
 lalr_state [83]: {
-  [typeFields ::= typeFields COMMA ID COLON ID (*) , {COMMA RPAREN RBRACE }]
+  [typeFields ::= ID COLON ID COMMA typeFields (*) , {RPAREN RBRACE }]
 }
 
 -------------------
 lalr_state [84]: {
-  [typeFields ::= ID COLON (*) ID , {COMMA RPAREN RBRACE }]
+  [typeDeclaration ::= TYPE ID (*) EQ type , {IN FUNCTION VAR TYPE }]
 }
-transition on ID to state [85]
+transition on EQ to state [85]
 
 -------------------
 lalr_state [85]: {
-  [typeFields ::= ID COLON ID (*) , {COMMA RPAREN RBRACE }]
-}
-
--------------------
-lalr_state [86]: {
-  [typeDeclaration ::= TYPE ID (*) EQ type , {IN FUNCTION VAR TYPE }]
-}
-transition on EQ to state [87]
-
--------------------
-lalr_state [87]: {
   [type ::= (*) ID , {IN FUNCTION VAR TYPE }]
   [typeDeclaration ::= TYPE ID EQ (*) type , {IN FUNCTION VAR TYPE }]
   [type ::= (*) LBRACE RBRACE , {IN FUNCTION VAR TYPE }]
   [type ::= (*) LBRACE typeFields RBRACE , {IN FUNCTION VAR TYPE }]
   [type ::= (*) ARRAY OF ID , {IN FUNCTION VAR TYPE }]
 }
-transition on ARRAY to state [91]
-transition on type to state [90]
-transition on LBRACE to state [89]
-transition on ID to state [88]
+transition on ARRAY to state [89]
+transition on type to state [88]
+transition on LBRACE to state [87]
+transition on ID to state [86]
 
 -------------------
-lalr_state [88]: {
+lalr_state [86]: {
   [type ::= ID (*) , {IN FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [89]: {
-  [typeFields ::= (*) typeFields COMMA ID COLON ID , {COMMA RBRACE }]
+lalr_state [87]: {
+  [typeFields ::= (*) ID COLON ID COMMA typeFields , {RBRACE }]
   [type ::= LBRACE (*) RBRACE , {IN FUNCTION VAR TYPE }]
-  [typeFields ::= (*) ID COLON ID , {COMMA RBRACE }]
+  [typeFields ::= (*) ID COLON ID , {RBRACE }]
   [type ::= LBRACE (*) typeFields RBRACE , {IN FUNCTION VAR TYPE }]
 }
-transition on RBRACE to state [95]
-transition on typeFields to state [94]
+transition on RBRACE to state [93]
+transition on typeFields to state [92]
 transition on ID to state [64]
 
 -------------------
-lalr_state [90]: {
+lalr_state [88]: {
   [typeDeclaration ::= TYPE ID EQ type (*) , {IN FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [91]: {
+lalr_state [89]: {
   [type ::= ARRAY (*) OF ID , {IN FUNCTION VAR TYPE }]
 }
-transition on OF to state [92]
+transition on OF to state [90]
 
 -------------------
-lalr_state [92]: {
+lalr_state [90]: {
   [type ::= ARRAY OF (*) ID , {IN FUNCTION VAR TYPE }]
 }
-transition on ID to state [93]
+transition on ID to state [91]
 
 -------------------
-lalr_state [93]: {
+lalr_state [91]: {
   [type ::= ARRAY OF ID (*) , {IN FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [94]: {
-  [typeFields ::= typeFields (*) COMMA ID COLON ID , {COMMA RBRACE }]
+lalr_state [92]: {
   [type ::= LBRACE typeFields (*) RBRACE , {IN FUNCTION VAR TYPE }]
 }
-transition on RBRACE to state [96]
-transition on COMMA to state [73]
+transition on RBRACE to state [94]
 
 -------------------
-lalr_state [95]: {
+lalr_state [93]: {
   [type ::= LBRACE RBRACE (*) , {IN FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [96]: {
+lalr_state [94]: {
   [type ::= LBRACE typeFields RBRACE (*) , {IN FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [97]: {
+lalr_state [95]: {
   [variableDeclaration ::= VAR ID (*) COLON ID ASSIGN expr , {IN FUNCTION VAR TYPE }]
   [variableDeclaration ::= VAR ID (*) ASSIGN expr , {IN FUNCTION VAR TYPE }]
 }
-transition on ASSIGN to state [99]
-transition on COLON to state [98]
+transition on ASSIGN to state [97]
+transition on COLON to state [96]
 
 -------------------
-lalr_state [98]: {
+lalr_state [96]: {
   [variableDeclaration ::= VAR ID COLON (*) ID ASSIGN expr , {IN FUNCTION VAR TYPE }]
 }
-transition on ID to state [101]
+transition on ID to state [99]
 
 -------------------
-lalr_state [99]: {
+lalr_state [97]: {
   [lvalue ::= (*) lvalue DOT ID , {LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN IN FUNCTION VAR TYPE }]
   [expr ::= (*) LET declarationList IN exprSeq END , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
   [expr ::= (*) LPAREN RPAREN , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
@@ -2485,7 +2455,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [100]
+transition on expr to state [98]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -2496,7 +2466,7 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [100]: {
+lalr_state [98]: {
   [expr ::= expr (*) GT expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
   [expr ::= expr (*) NEQ expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
   [expr ::= expr (*) OR expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
@@ -2525,13 +2495,13 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [101]: {
+lalr_state [99]: {
   [variableDeclaration ::= VAR ID COLON ID (*) ASSIGN expr , {IN FUNCTION VAR TYPE }]
 }
-transition on ASSIGN to state [102]
+transition on ASSIGN to state [100]
 
 -------------------
-lalr_state [102]: {
+lalr_state [100]: {
   [lvalue ::= (*) lvalue DOT ID , {LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN IN FUNCTION VAR TYPE }]
   [expr ::= (*) LET declarationList IN exprSeq END , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
   [expr ::= (*) LPAREN RPAREN , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
@@ -2574,7 +2544,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [103]
+transition on expr to state [101]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -2585,7 +2555,7 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [103]: {
+lalr_state [101]: {
   [expr ::= expr (*) GT expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
   [expr ::= expr (*) NEQ expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
   [expr ::= expr (*) OR expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR IN FUNCTION VAR TYPE }]
@@ -2614,22 +2584,22 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [104]: {
+lalr_state [102]: {
   [functionDeclarationList ::= functionDeclaration functionDeclarationList (*) , {IN FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [105]: {
+lalr_state [103]: {
   [declarationList ::= declaration declarationList (*) , {IN }]
 }
 
 -------------------
-lalr_state [106]: {
+lalr_state [104]: {
   [typeDeclarationList ::= typeDeclaration typeDeclarationList (*) , {IN FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [107]: {
+lalr_state [105]: {
   [expr ::= LET declarationList IN (*) exprSeq END , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [lvalue ::= (*) lvalue DOT ID , {SEMICOLON LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN END }]
   [expr ::= (*) LET declarationList IN exprSeq END , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
@@ -2650,7 +2620,7 @@ lalr_state [107]: {
   [expr ::= (*) expr OR expr , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) STRING , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [lvalue ::= (*) ID LBRACK expr RBRACK , {SEMICOLON LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN END }]
-  [exprSeq ::= (*) expr , {SEMICOLON END }]
+  [exprSeq ::= (*) expr , {END }]
   [expr ::= (*) ID LBRACE RBRACE , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) expr LE expr , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) expr PLUS expr , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
@@ -2658,7 +2628,7 @@ lalr_state [107]: {
   [expr ::= (*) ID LPAREN RPAREN , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) expr AND expr , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) INT , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
-  [exprSeq ::= (*) exprSeq SEMICOLON expr , {SEMICOLON END }]
+  [exprSeq ::= (*) expr SEMICOLON exprSeq , {END }]
   [expr ::= (*) ID LBRACK expr RBRACK OF expr , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) expr GT expr , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
   [expr ::= (*) expr MINUS expr , {SEMICOLON PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR END }]
@@ -2674,50 +2644,48 @@ lalr_state [107]: {
 transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
-transition on END to state [109]
+transition on END to state [107]
 transition on LET to state [11]
 transition on expr to state [48]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
 transition on NIL to state [5]
-transition on exprSeq to state [108]
+transition on exprSeq to state [106]
 transition on FOR to state [4]
 transition on WHILE to state [3]
 transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [108]: {
-  [exprSeq ::= exprSeq (*) SEMICOLON expr , {SEMICOLON END }]
+lalr_state [106]: {
   [expr ::= LET declarationList IN exprSeq (*) END , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
-transition on END to state [110]
-transition on SEMICOLON to state [50]
+transition on END to state [108]
 
 -------------------
-lalr_state [109]: {
+lalr_state [107]: {
   [expr ::= LET declarationList IN END (*) , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [110]: {
+lalr_state [108]: {
   [expr ::= LET declarationList IN exprSeq END (*) , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [111]: {
+lalr_state [109]: {
   [expr ::= ID LBRACE (*) fieldList RBRACE , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
-  [fieldList ::= (*) ID EQ expr , {COMMA RBRACE }]
+  [fieldList ::= (*) ID EQ expr , {RBRACE }]
   [expr ::= ID LBRACE (*) RBRACE , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
-  [fieldList ::= (*) fieldList COMMA ID EQ expr , {COMMA RBRACE }]
+  [fieldList ::= (*) ID EQ expr COMMA fieldList , {RBRACE }]
 }
-transition on RBRACE to state [126]
-transition on fieldList to state [125]
-transition on ID to state [124]
+transition on RBRACE to state [124]
+transition on fieldList to state [123]
+transition on ID to state [122]
 
 -------------------
-lalr_state [112]: {
+lalr_state [110]: {
   [lvalue ::= (*) lvalue DOT ID , {LBRACK RBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
   [expr ::= (*) LET declarationList IN exprSeq END , {RBRACK PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) LPAREN RPAREN , {RBRACK PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
@@ -2761,7 +2729,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [120]
+transition on expr to state [118]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -2772,13 +2740,13 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [113]: {
+lalr_state [111]: {
   [lvalue ::= (*) lvalue DOT ID , {COMMA RPAREN LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
   [expr ::= (*) LET declarationList IN exprSeq END , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) LPAREN RPAREN , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr NEQ expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) lvalue , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [exprList ::= (*) exprList COMMA expr , {COMMA RPAREN }]
+  [exprList ::= (*) expr COMMA exprList , {RPAREN }]
   [expr ::= (*) IF expr THEN expr ELSE expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) lvalue ASSIGN expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr DIVIDE expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
@@ -2809,7 +2777,7 @@ lalr_state [113]: {
   [expr ::= (*) LPAREN exprSeq RPAREN , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr EQ expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) NIL , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [exprList ::= (*) expr , {COMMA RPAREN }]
+  [exprList ::= (*) expr , {RPAREN }]
   [expr ::= (*) IF expr THEN expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr GE expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr TIMES expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
@@ -2818,11 +2786,11 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [116]
-transition on RPAREN to state [115]
+transition on expr to state [114]
+transition on RPAREN to state [113]
 transition on ID to state [9]
 transition on IF to state [8]
-transition on exprList to state [114]
+transition on exprList to state [112]
 transition on STRING to state [7]
 transition on NIL to state [5]
 transition on FOR to state [4]
@@ -2831,26 +2799,25 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [114]: {
+lalr_state [112]: {
   [expr ::= ID LPAREN exprList (*) RPAREN , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
-  [exprList ::= exprList (*) COMMA expr , {COMMA RPAREN }]
 }
-transition on RPAREN to state [118]
-transition on COMMA to state [117]
+transition on RPAREN to state [117]
 
 -------------------
-lalr_state [115]: {
+lalr_state [113]: {
   [expr ::= ID LPAREN RPAREN (*) , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [116]: {
+lalr_state [114]: {
   [expr ::= expr (*) GT expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= expr (*) NEQ expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [exprList ::= expr (*) COMMA exprList , {RPAREN }]
   [expr ::= expr (*) OR expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= expr (*) MINUS expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= expr (*) LE expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [exprList ::= expr (*) , {COMMA RPAREN }]
+  [exprList ::= expr (*) , {RPAREN }]
   [expr ::= expr (*) EQ expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= expr (*) DIVIDE expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= expr (*) PLUS expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
@@ -2862,6 +2829,7 @@ lalr_state [116]: {
 transition on OR to state [30]
 transition on LT to state [29]
 transition on TIMES to state [28]
+transition on COMMA to state [115]
 transition on GT to state [27]
 transition on LE to state [26]
 transition on EQ to state [25]
@@ -2873,13 +2841,14 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [117]: {
+lalr_state [115]: {
   [lvalue ::= (*) lvalue DOT ID , {COMMA RPAREN LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
   [expr ::= (*) LET declarationList IN exprSeq END , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) LPAREN RPAREN , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr NEQ expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) lvalue , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [exprList ::= exprList COMMA (*) expr , {COMMA RPAREN }]
+  [exprList ::= expr COMMA (*) exprList , {RPAREN }]
+  [exprList ::= (*) expr COMMA exprList , {RPAREN }]
   [expr ::= (*) IF expr THEN expr ELSE expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) lvalue ASSIGN expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr DIVIDE expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
@@ -2908,6 +2877,7 @@ lalr_state [117]: {
   [expr ::= (*) LPAREN exprSeq RPAREN , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr EQ expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) NIL , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [exprList ::= (*) expr , {RPAREN }]
   [expr ::= (*) IF expr THEN expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr GE expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= (*) expr TIMES expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
@@ -2916,9 +2886,10 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [119]
+transition on expr to state [114]
 transition on ID to state [9]
 transition on IF to state [8]
+transition on exprList to state [116]
 transition on STRING to state [7]
 transition on NIL to state [5]
 transition on FOR to state [4]
@@ -2927,41 +2898,17 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [118]: {
+lalr_state [116]: {
+  [exprList ::= expr COMMA exprList (*) , {RPAREN }]
+}
+
+-------------------
+lalr_state [117]: {
   [expr ::= ID LPAREN exprList RPAREN (*) , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [119]: {
-  [expr ::= expr (*) GT expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) NEQ expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) OR expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) MINUS expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) LE expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) EQ expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) DIVIDE expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) PLUS expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) GE expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) LT expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) AND expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) TIMES expr , {COMMA RPAREN PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [exprList ::= exprList COMMA expr (*) , {COMMA RPAREN }]
-}
-transition on OR to state [30]
-transition on LT to state [29]
-transition on TIMES to state [28]
-transition on GT to state [27]
-transition on LE to state [26]
-transition on EQ to state [25]
-transition on PLUS to state [24]
-transition on NEQ to state [23]
-transition on GE to state [22]
-transition on DIVIDE to state [21]
-transition on MINUS to state [20]
-transition on AND to state [19]
-
--------------------
-lalr_state [120]: {
+lalr_state [118]: {
   [expr ::= expr (*) GT expr , {RBRACK PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= expr (*) NEQ expr , {RBRACK PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
   [expr ::= expr (*) OR expr , {RBRACK PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
@@ -2981,7 +2928,7 @@ transition on OR to state [30]
 transition on LT to state [29]
 transition on TIMES to state [28]
 transition on GT to state [27]
-transition on RBRACK to state [121]
+transition on RBRACK to state [119]
 transition on LE to state [26]
 transition on EQ to state [25]
 transition on PLUS to state [24]
@@ -2992,14 +2939,14 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [121]: {
+lalr_state [119]: {
   [expr ::= ID LBRACK expr RBRACK (*) OF expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [lvalue ::= ID LBRACK expr RBRACK (*) , {EOF COMMA SEMICOLON RPAREN LBRACK RBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
-transition on OF to state [122]
+transition on OF to state [120]
 
 -------------------
-lalr_state [122]: {
+lalr_state [120]: {
   [lvalue ::= (*) lvalue DOT ID , {EOF COMMA SEMICOLON RPAREN LBRACK RBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= (*) LET declarationList IN exprSeq END , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= (*) LPAREN RPAREN , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
@@ -3042,7 +2989,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [123]
+transition on expr to state [121]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -3053,7 +3000,7 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [123]: {
+lalr_state [121]: {
   [expr ::= expr (*) GT expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= expr (*) NEQ expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= expr (*) OR expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
@@ -3082,209 +3029,130 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [124]: {
-  [fieldList ::= ID (*) EQ expr , {COMMA RBRACE }]
+lalr_state [122]: {
+  [fieldList ::= ID (*) EQ expr , {RBRACE }]
+  [fieldList ::= ID (*) EQ expr COMMA fieldList , {RBRACE }]
 }
-transition on EQ to state [132]
+transition on EQ to state [126]
 
 -------------------
-lalr_state [125]: {
-  [fieldList ::= fieldList (*) COMMA ID EQ expr , {COMMA RBRACE }]
+lalr_state [123]: {
   [expr ::= ID LBRACE fieldList (*) RBRACE , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
-transition on RBRACE to state [128]
-transition on COMMA to state [127]
+transition on RBRACE to state [125]
 
 -------------------
-lalr_state [126]: {
+lalr_state [124]: {
   [expr ::= ID LBRACE RBRACE (*) , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [127]: {
-  [fieldList ::= fieldList COMMA (*) ID EQ expr , {COMMA RBRACE }]
-}
-transition on ID to state [129]
-
--------------------
-lalr_state [128]: {
+lalr_state [125]: {
   [expr ::= ID LBRACE fieldList RBRACE (*) , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
 
 -------------------
-lalr_state [129]: {
-  [fieldList ::= fieldList COMMA ID (*) EQ expr , {COMMA RBRACE }]
+lalr_state [126]: {
+  [lvalue ::= (*) lvalue DOT ID , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
+  [expr ::= (*) LET declarationList IN exprSeq END , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) LPAREN RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr NEQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) lvalue , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) IF expr THEN expr ELSE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) lvalue ASSIGN expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr DIVIDE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [lvalue ::= (*) lvalue LBRACK expr RBRACK , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
+  [expr ::= (*) LET declarationList IN END , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) ID LBRACE fieldList RBRACE , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr LT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) MINUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [fieldList ::= ID EQ (*) expr , {RBRACE }]
+  [expr ::= (*) WHILE expr DO expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) ID LPAREN exprList RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr OR expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) STRING , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [lvalue ::= (*) ID LBRACK expr RBRACK , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
+  [expr ::= (*) ID LBRACE RBRACE , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr LE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr PLUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [fieldList ::= ID EQ (*) expr COMMA fieldList , {RBRACE }]
+  [expr ::= (*) FOR ID ASSIGN expr TO expr DO expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) ID LPAREN RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr AND expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) INT , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) ID LBRACK expr RBRACK OF expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr GT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr MINUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [lvalue ::= (*) ID , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
+  [expr ::= (*) BREAK , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) LPAREN exprSeq RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr EQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) NIL , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) IF expr THEN expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr GE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= (*) expr TIMES expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
 }
-transition on EQ to state [130]
+transition on BREAK to state [14]
+transition on lvalue to state [13]
+transition on LPAREN to state [12]
+transition on LET to state [11]
+transition on expr to state [127]
+transition on ID to state [9]
+transition on IF to state [8]
+transition on STRING to state [7]
+transition on NIL to state [5]
+transition on FOR to state [4]
+transition on WHILE to state [3]
+transition on INT to state [2]
+transition on MINUS to state [1]
+
+-------------------
+lalr_state [127]: {
+  [expr ::= expr (*) GT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= expr (*) NEQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= expr (*) OR expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= expr (*) MINUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [fieldList ::= ID EQ expr (*) COMMA fieldList , {RBRACE }]
+  [expr ::= expr (*) LE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= expr (*) EQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= expr (*) DIVIDE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= expr (*) PLUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [fieldList ::= ID EQ expr (*) , {RBRACE }]
+  [expr ::= expr (*) GE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= expr (*) LT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= expr (*) AND expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+  [expr ::= expr (*) TIMES expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
+}
+transition on OR to state [30]
+transition on LT to state [29]
+transition on TIMES to state [28]
+transition on COMMA to state [128]
+transition on GT to state [27]
+transition on LE to state [26]
+transition on EQ to state [25]
+transition on PLUS to state [24]
+transition on NEQ to state [23]
+transition on GE to state [22]
+transition on DIVIDE to state [21]
+transition on MINUS to state [20]
+transition on AND to state [19]
+
+-------------------
+lalr_state [128]: {
+  [fieldList ::= (*) ID EQ expr , {RBRACE }]
+  [fieldList ::= ID EQ expr COMMA (*) fieldList , {RBRACE }]
+  [fieldList ::= (*) ID EQ expr COMMA fieldList , {RBRACE }]
+}
+transition on fieldList to state [129]
+transition on ID to state [122]
+
+-------------------
+lalr_state [129]: {
+  [fieldList ::= ID EQ expr COMMA fieldList (*) , {RBRACE }]
+}
 
 -------------------
 lalr_state [130]: {
-  [lvalue ::= (*) lvalue DOT ID , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
-  [expr ::= (*) LET declarationList IN exprSeq END , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) LPAREN RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr NEQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) lvalue , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) IF expr THEN expr ELSE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) lvalue ASSIGN expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr DIVIDE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [lvalue ::= (*) lvalue LBRACK expr RBRACK , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
-  [expr ::= (*) LET declarationList IN END , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) ID LBRACE fieldList RBRACE , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr LT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) MINUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) WHILE expr DO expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) ID LPAREN exprList RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr OR expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) STRING , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [lvalue ::= (*) ID LBRACK expr RBRACK , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
-  [expr ::= (*) ID LBRACE RBRACE , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr LE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr PLUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [fieldList ::= fieldList COMMA ID EQ (*) expr , {COMMA RBRACE }]
-  [expr ::= (*) FOR ID ASSIGN expr TO expr DO expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) ID LPAREN RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr AND expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) INT , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) ID LBRACK expr RBRACK OF expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr GT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr MINUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [lvalue ::= (*) ID , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
-  [expr ::= (*) BREAK , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) LPAREN exprSeq RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr EQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) NIL , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) IF expr THEN expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr GE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr TIMES expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-}
-transition on BREAK to state [14]
-transition on lvalue to state [13]
-transition on LPAREN to state [12]
-transition on LET to state [11]
-transition on expr to state [131]
-transition on ID to state [9]
-transition on IF to state [8]
-transition on STRING to state [7]
-transition on NIL to state [5]
-transition on FOR to state [4]
-transition on WHILE to state [3]
-transition on INT to state [2]
-transition on MINUS to state [1]
-
--------------------
-lalr_state [131]: {
-  [expr ::= expr (*) GT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) NEQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) OR expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) MINUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [fieldList ::= fieldList COMMA ID EQ expr (*) , {COMMA RBRACE }]
-  [expr ::= expr (*) LE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) EQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) DIVIDE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) PLUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) GE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) LT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) AND expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) TIMES expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-}
-transition on OR to state [30]
-transition on LT to state [29]
-transition on TIMES to state [28]
-transition on GT to state [27]
-transition on LE to state [26]
-transition on EQ to state [25]
-transition on PLUS to state [24]
-transition on NEQ to state [23]
-transition on GE to state [22]
-transition on DIVIDE to state [21]
-transition on MINUS to state [20]
-transition on AND to state [19]
-
--------------------
-lalr_state [132]: {
-  [lvalue ::= (*) lvalue DOT ID , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
-  [expr ::= (*) LET declarationList IN exprSeq END , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) LPAREN RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr NEQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) lvalue , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) IF expr THEN expr ELSE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) lvalue ASSIGN expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr DIVIDE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [lvalue ::= (*) lvalue LBRACK expr RBRACK , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
-  [expr ::= (*) LET declarationList IN END , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) ID LBRACE fieldList RBRACE , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr LT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) MINUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [fieldList ::= ID EQ (*) expr , {COMMA RBRACE }]
-  [expr ::= (*) WHILE expr DO expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) ID LPAREN exprList RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr OR expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) STRING , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [lvalue ::= (*) ID LBRACK expr RBRACK , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
-  [expr ::= (*) ID LBRACE RBRACE , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr LE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr PLUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) FOR ID ASSIGN expr TO expr DO expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) ID LPAREN RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr AND expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) INT , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) ID LBRACK expr RBRACK OF expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr GT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr MINUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [lvalue ::= (*) ID , {COMMA LBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN }]
-  [expr ::= (*) BREAK , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) LPAREN exprSeq RPAREN , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr EQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) NIL , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) IF expr THEN expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr GE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= (*) expr TIMES expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-}
-transition on BREAK to state [14]
-transition on lvalue to state [13]
-transition on LPAREN to state [12]
-transition on LET to state [11]
-transition on expr to state [133]
-transition on ID to state [9]
-transition on IF to state [8]
-transition on STRING to state [7]
-transition on NIL to state [5]
-transition on FOR to state [4]
-transition on WHILE to state [3]
-transition on INT to state [2]
-transition on MINUS to state [1]
-
--------------------
-lalr_state [133]: {
-  [expr ::= expr (*) GT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) NEQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) OR expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) MINUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) LE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) EQ expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) DIVIDE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) PLUS expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [fieldList ::= ID EQ expr (*) , {COMMA RBRACE }]
-  [expr ::= expr (*) GE expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) LT expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) AND expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-  [expr ::= expr (*) TIMES expr , {COMMA RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR }]
-}
-transition on OR to state [30]
-transition on LT to state [29]
-transition on TIMES to state [28]
-transition on GT to state [27]
-transition on LE to state [26]
-transition on EQ to state [25]
-transition on PLUS to state [24]
-transition on NEQ to state [23]
-transition on GE to state [22]
-transition on DIVIDE to state [21]
-transition on MINUS to state [20]
-transition on AND to state [19]
-
--------------------
-lalr_state [134]: {
   [expr ::= expr (*) GT expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN }]
   [expr ::= expr (*) NEQ expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN }]
   [expr ::= expr (*) OR expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN }]
@@ -3308,14 +3176,14 @@ transition on LE to state [26]
 transition on EQ to state [25]
 transition on PLUS to state [24]
 transition on NEQ to state [23]
-transition on THEN to state [135]
+transition on THEN to state [131]
 transition on GE to state [22]
 transition on DIVIDE to state [21]
 transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [135]: {
+lalr_state [131]: {
   [lvalue ::= (*) lvalue DOT ID , {EOF COMMA SEMICOLON RPAREN LBRACK RBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= (*) LET declarationList IN exprSeq END , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= (*) LPAREN RPAREN , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
@@ -3359,7 +3227,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [136]
+transition on expr to state [132]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -3370,7 +3238,7 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [136]: {
+lalr_state [132]: {
   [expr ::= expr (*) GT expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= expr (*) NEQ expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= IF expr THEN expr (*) ELSE expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
@@ -3390,7 +3258,7 @@ transition on OR to state [30]
 transition on LT to state [29]
 transition on TIMES to state [28]
 transition on GT to state [27]
-transition on ELSE to state [137]
+transition on ELSE to state [133]
 transition on LE to state [26]
 transition on EQ to state [25]
 transition on PLUS to state [24]
@@ -3401,7 +3269,7 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [137]: {
+lalr_state [133]: {
   [lvalue ::= (*) lvalue DOT ID , {EOF COMMA SEMICOLON RPAREN LBRACK RBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= (*) LET declarationList IN exprSeq END , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= (*) LPAREN RPAREN , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
@@ -3444,7 +3312,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [138]
+transition on expr to state [134]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -3455,7 +3323,7 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [138]: {
+lalr_state [134]: {
   [expr ::= expr (*) GT expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= expr (*) NEQ expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= expr (*) OR expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
@@ -3484,18 +3352,18 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [139]: {
+lalr_state [135]: {
   [$START ::= program EOF (*) , {EOF }]
 }
 
 -------------------
-lalr_state [140]: {
+lalr_state [136]: {
   [expr ::= FOR ID (*) ASSIGN expr TO expr DO expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
 }
-transition on ASSIGN to state [141]
+transition on ASSIGN to state [137]
 
 -------------------
-lalr_state [141]: {
+lalr_state [137]: {
   [lvalue ::= (*) lvalue DOT ID , {LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN TO }]
   [expr ::= (*) LET declarationList IN exprSeq END , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR TO }]
   [expr ::= (*) LPAREN RPAREN , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR TO }]
@@ -3538,7 +3406,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [142]
+transition on expr to state [138]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -3549,7 +3417,7 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [142]: {
+lalr_state [138]: {
   [expr ::= expr (*) GT expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR TO }]
   [expr ::= expr (*) NEQ expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR TO }]
   [expr ::= expr (*) OR expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR TO }]
@@ -3572,14 +3440,14 @@ transition on LE to state [26]
 transition on EQ to state [25]
 transition on PLUS to state [24]
 transition on NEQ to state [23]
-transition on TO to state [143]
+transition on TO to state [139]
 transition on GE to state [22]
 transition on DIVIDE to state [21]
 transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [143]: {
+lalr_state [139]: {
   [lvalue ::= (*) lvalue DOT ID , {LBRACK DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN DO }]
   [expr ::= (*) LET declarationList IN exprSeq END , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR DO }]
   [expr ::= (*) LPAREN RPAREN , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR DO }]
@@ -3622,7 +3490,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [144]
+transition on expr to state [140]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -3633,7 +3501,7 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [144]: {
+lalr_state [140]: {
   [expr ::= expr (*) GT expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR DO }]
   [expr ::= expr (*) NEQ expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR DO }]
   [expr ::= expr (*) OR expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR DO }]
@@ -3649,7 +3517,7 @@ lalr_state [144]: {
   [expr ::= expr (*) TIMES expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR DO }]
 }
 transition on OR to state [30]
-transition on DO to state [145]
+transition on DO to state [141]
 transition on LT to state [29]
 transition on TIMES to state [28]
 transition on GT to state [27]
@@ -3663,7 +3531,7 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [145]: {
+lalr_state [141]: {
   [lvalue ::= (*) lvalue DOT ID , {EOF COMMA SEMICOLON RPAREN LBRACK RBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= (*) LET declarationList IN exprSeq END , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= (*) LPAREN RPAREN , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
@@ -3706,7 +3574,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [146]
+transition on expr to state [142]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -3717,7 +3585,7 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [146]: {
+lalr_state [142]: {
   [expr ::= expr (*) GT expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= expr (*) NEQ expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= expr (*) OR expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
@@ -3746,7 +3614,7 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [147]: {
+lalr_state [143]: {
   [expr ::= expr (*) GT expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR DO }]
   [expr ::= expr (*) NEQ expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR DO }]
   [expr ::= expr (*) OR expr , {PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR DO }]
@@ -3763,7 +3631,7 @@ lalr_state [147]: {
 }
 transition on OR to state [30]
 transition on LT to state [29]
-transition on DO to state [148]
+transition on DO to state [144]
 transition on TIMES to state [28]
 transition on GT to state [27]
 transition on LE to state [26]
@@ -3776,7 +3644,7 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [148]: {
+lalr_state [144]: {
   [lvalue ::= (*) lvalue DOT ID , {EOF COMMA SEMICOLON RPAREN LBRACK RBRACK RBRACE DOT PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR ASSIGN THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= (*) LET declarationList IN exprSeq END , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= (*) LPAREN RPAREN , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
@@ -3819,7 +3687,7 @@ transition on BREAK to state [14]
 transition on lvalue to state [13]
 transition on LPAREN to state [12]
 transition on LET to state [11]
-transition on expr to state [149]
+transition on expr to state [145]
 transition on ID to state [9]
 transition on IF to state [8]
 transition on STRING to state [7]
@@ -3830,7 +3698,7 @@ transition on INT to state [2]
 transition on MINUS to state [1]
 
 -------------------
-lalr_state [149]: {
+lalr_state [145]: {
   [expr ::= expr (*) GT expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= expr (*) NEQ expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= expr (*) OR expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
@@ -3859,7 +3727,7 @@ transition on MINUS to state [20]
 transition on AND to state [19]
 
 -------------------
-lalr_state [150]: {
+lalr_state [146]: {
   [expr ::= expr (*) GT expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= expr (*) NEQ expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
   [expr ::= expr (*) OR expr , {EOF COMMA SEMICOLON RPAREN RBRACK RBRACE PLUS MINUS TIMES DIVIDE EQ NEQ LT LE GT GE AND OR THEN ELSE TO DO IN END FUNCTION VAR TYPE }]
@@ -3892,7 +3760,7 @@ Closing files...
 ------- CUP v0.10k Parser Generation Summary -------
   0 errors and 1 warning
   46 terminals, 16 non-terminals, and 66 productions declared, 
-  producing 151 unique parse states.
+  producing 147 unique parse states.
   0 terminals declared but not used.
   0 non-terminals declared but not used.
   0 productions never reduced.

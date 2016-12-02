@@ -29,6 +29,7 @@ public class Semant {
 	ExpTy transVar(SimpleVar e)
 	{
 		Entry exp = (Entry) env.vEnv.get(e.name);
+		//env.errorMsg(e.pos,"SimpleVar"+e.name.toString()+((VarEntry)exp).ty.toString());//=================
 		if ((exp == null) || !(exp instanceof VarEntry))
 		{
 			env.errorMsg(e.pos, "Undefined var\""+e.name+"\"! (transVar SimpleVar)");
@@ -113,6 +114,7 @@ public class Semant {
 	}
 
 	ExpTy transExp(VarExp e) {
+		//env.errorMsg(e.pos, "VarExp");
 		return transVar(e.var);
 	}
 
@@ -197,13 +199,13 @@ public class Semant {
 				right = transExp(e.right);
 				//env.errorMsg(e.pos, left.ty.toString());
 				//env.errorMsg(e.pos, right.ty.toString()); //====================
-				if ((left.ty instanceof Types.VOID) || (right.ty instanceof Types.VOID))
+				if ((left.ty.actual() instanceof Types.VOID) || (right.ty.actual() instanceof Types.VOID))
 					env.errorMsg(e.pos, "Can't compare VOID!");
-				if ((left.ty instanceof Types.NIL) && (right.ty instanceof Types.NIL))
+				if ((left.ty.actual() instanceof Types.NIL) && (right.ty.actual() instanceof Types.NIL))
 					env.errorMsg(e.pos, "Can't both be NIL!");
 				if (!left.ty.coerceTo(right.ty))
-					if (!((left.ty instanceof Types.NIL) && (right.ty instanceof Types.RECORD)))
-						if (!((left.ty instanceof Types.RECORD) && (right.ty instanceof Types.NIL)))
+					if (!((left.ty.actual() instanceof Types.NIL) && (right.ty.actual() instanceof Types.RECORD)))
+						if (!((left.ty.actual() instanceof Types.RECORD) && (right.ty.actual() instanceof Types.NIL)))
 							env.errorMsg(e.pos, "Types does't match!");
 				return new ExpTy(null, INT);
 			case OpExp.NE:
@@ -296,6 +298,7 @@ public class Semant {
 	{
 		if (e == null || e.list == null)
 			return new ExpTy(null, VOID);
+		//env.errorMsg(e.pos, "SeqExp");//==========================
 		ExpTy t = null;
 		for (ExpList i = e.list; i != null; i = i.tail)
 			t = transExp(i.head);
@@ -318,7 +321,8 @@ public class Semant {
 		if (right.ty.coerceTo(VOID))
 			env.errorMsg(e.pos,"Can't assign a VOID! (transExp AssignExp)");
 		if (!left.ty.coerceTo(right.ty))
-			env.errorMsg(e.pos, "Different type between ':=' (transExp AssignExp)");
+			if (!((left.ty instanceof Types.RECORD) && (right.ty instanceof Types.NIL)))
+				env.errorMsg(e.pos, "Different type between ':=' (transExp AssignExp)");
 		return right;
 	}
 
@@ -354,6 +358,7 @@ public class Semant {
 		}
 		++loopNumber;
 		transExp(e.body);
+		//env.errorMsg(e.pos, "WhileExp");//==================
 		--loopNumber;
 		return new ExpTy(null, VOID);
 	}
@@ -397,6 +402,7 @@ public class Semant {
 		env.vEnv.beginScope();
 		for (DecList i = e.decs; i != null; i = i.tail)
 			transDec(i.head);
+		//env.errorMsg(e.pos, "let!");//===================
 		ExpTy exp = transExp(e.body);
 		env.vEnv.endScope();
 		env.tEnv.endScope();
@@ -534,9 +540,12 @@ public class Semant {
 				continue;
 			}
 			else env.vEnv.put(i.name, new FunEntry(formals, result));
-
+		}
+		for (FunctionDec i = e; i != null; i = i.next)
+		{
 			env.vEnv.beginScope();
 			blockp.clear();
+			Types.Type result = transTy(i.result);
 			for (FieldList j = i.params; j != null; j = j.tail)
 			{
 				if (blockp.contains(j.name.toString()))
@@ -552,7 +561,12 @@ public class Semant {
 					env.errorMsg(i.pos, "Undefined type \""+j.name+"\" (transDev FunctionDec)");
 				else env.vEnv.put(j.name, new VarEntry(pty));
 			}
-			if (!(transExp(i.body).ty.coerceTo(result)))
+			//env.errorMsg(e.pos, e.name.toString());
+			//env.errorMsg(e.pos, result.toString());
+			ExpTy re = transExp(i.body);
+			//env.errorMsg(e.pos, re.ty.toString());
+			//System.out.println("//=============");//==========================
+			if (!(re.ty.coerceTo(result)))
 				env.errorMsg(i.pos, "Return valiable doesn't match! (transDev FunctionDec)");
 			env.vEnv.endScope();
 		}

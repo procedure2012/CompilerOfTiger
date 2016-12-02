@@ -105,13 +105,13 @@ expr ::= STRING:s											{:RESULT = new StringExp(sleft, s);:}
 	|	LET:l declarationList:dl IN END						{:RESULT = new LetExp(lleft, dl, null);:}
 	;
 exprSeq ::= expr:e											{:RESULT = new ExpList(e, null);:}
-	|	exprSeq:es SEMICOLON expr:e							{:RESULT = new ExpList(e, es);:}
+	|	expr:e SEMICOLON exprSeq:es							{:RESULT = new ExpList(e, es);:}
 	;
 exprList ::= expr:e											{:RESULT = new ExpList(e, null);:}
-	|	exprList:el COMMA expr:e							{:RESULT = new ExpList(e, el);:}
+	|	expr:e COMMA exprList:el							{:RESULT = new ExpList(e, el);:}
 	;
 fieldList ::= ID:id EQ expr:e								{:RESULT = new FieldExpList(idleft, Symbol.Symbol.symbol(id), e, null);:}
-	|	fieldList:fl COMMA ID:id EQ expr:e					{:RESULT = new FieldExpList(idleft, Symbol.Symbol.symbol(id), e, fl);:}
+	|	ID:id EQ expr:e COMMA fieldList:fl 					{:RESULT = new FieldExpList(idleft, Symbol.Symbol.symbol(id), e, fl);:}
 	;
 lvalue ::= ID:id											{:RESULT = new SimpleVar(idleft, Symbol.Symbol.symbol(id));:}
 	|	lvalue:l DOT ID:id									{:RESULT = new FieldVar(lleft, l, Symbol.Symbol.symbol(id));:}
@@ -136,7 +136,7 @@ type ::= ID:id												{:RESULT = new NameTy(idleft, Symbol.Symbol.symbol(id)
 	|	ARRAY:a OF ID:id									{:RESULT = new ArrayTy(aleft, Symbol.Symbol.symbol(id));:} 
 	;
 typeFields ::= ID:id1 COLON ID:id2							{:RESULT = new FieldList(id1left, Symbol.Symbol.symbol(id1), Symbol.Symbol.symbol(id2), null);:}
-	|	typeFields:tfs COMMA ID:id1 COLON ID:id2			{:RESULT = new FieldList(id1left, Symbol.Symbol.symbol(id1), Symbol.Symbol.symbol(id2), tfs);:}
+	|	ID:id1 COLON ID:id2 COMMA typeFields:tfs			{:RESULT = new FieldList(id1left, Symbol.Symbol.symbol(id1), Symbol.Symbol.symbol(id2), tfs);:}
 	;
 variableDeclaration ::= VAR:v ID:id ASSIGN expr:e			{:RESULT = new VarDec(vleft, Symbol.Symbol.symbol(id), null, e);:}
 	|	VAR:v ID:id1 COLON ID:id2 ASSIGN expr:e				{:RESULT = new VarDec(vleft, Symbol.Symbol.symbol(id1), new NameTy(id1left, Symbol.Symbol.symbol(id2)), e);:}
