@@ -47,10 +47,10 @@ Yylex(java.io.InputStream s, ErrorMsg e) {
     }
 %eofval}       
 
-ws = \n|\r|\n\r|\r\n|\ |\t|\f
 id = [a-zA-Z][a-zA-Z0-9_]*
 num = [0-9]+
 nl = \n|\r|\n\r|\r\n
+ws = \n|\r|\n\r|\r\n
 
 %state STRING
 %state COMMENT
@@ -61,7 +61,9 @@ nl = \n|\r|\n\r|\r\n
 <YYINITIAL> \" {s.setLength(0);yybegin(STRING);}
 <YYINITIAL> "/*" {layer=1;yybegin(COMMENT);}
 <YYINITIAL> "*/" {err("Comment end but never start!");}
-<YYINITIAL> {ws} {}
+<YYINITIAL> " " {}
+<YYINITIAL> "\t" {}
+<YYINITIAL> {ws} {newline();}
 <YYINITIAL> "," {return tok(sym.COMMA, null);}
 <YYINITIAL> ":" {return tok(sym.COLON, null);}
 <YYINITIAL> ";" {return tok(sym.SEMICOLON, null);}

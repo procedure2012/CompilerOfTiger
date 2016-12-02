@@ -1,6 +1,6 @@
 package Semant;
 
-class VarEnrty extends Enrtry {
+class VarEntry extends Entry {
 	Types.Type ty;
-	VarEnrty(Types.Type t) {ty = t;}
+	VarEntry(Types.Type t) {ty = t;}
 }

@@ -43,8 +43,8 @@ non terminal ExpList exprList, exprSeq;
 non terminal Dec declaration;
 non terminal DecList declarationList;
 non terminal VarDec variableDeclaration;
-non terminal TypeDec typeDeclaration;
-non terminal FunctionDec functionDeclaration;
+non terminal TypeDec typeDeclaration, typeDeclarationList;
+non terminal FunctionDec functionDeclaration, functionDeclarationList;
 non terminal Ty type;
 non terminal Var lvalue;
 non terminal FieldExpList fieldList;
@@ -64,7 +64,11 @@ precedence left UMINUS;
 
 start with program;
 
-program ::= expr:e											{:parser.parseResult = (Exp)e;:}
+program ::= expr:e	{:parser.parseResult = (Exp)e;
+	Print P = new Print(System.out);
+	P.prExp(e, 3);
+	Semant.Semant S = new Semant.Semant(parser.errorMsg);
+	S.transExp(e);:}
 	;
 
 expr ::= STRING:s											{:RESULT = new StringExp(sleft, s);:}
@@ -115,11 +119,14 @@ lvalue ::= ID:id											{:RESULT = new SimpleVar(idleft, Symbol.Symbol.symbol
 	|	ID:id LBRACK expr:e RBRACK							{:RESULT = new SubscriptVar(idleft, new SimpleVar(idleft, Symbol.Symbol.symbol(id)), e);:}
 	;
 declarationList ::= declaration:d							{:RESULT = new DecList(d, null);:}
-	|	declarationList:dl declaration:d					{:RESULT = new DecList(d, dl);:}
+	|	declaration:d declarationList:dl				{:RESULT = new DecList(d, dl);:}
 	;
-declaration ::= typeDeclaration:td							{:RESULT = td;:}
+declaration ::= typeDeclarationList:td							{:RESULT = td;:}
 	|	variableDeclaration:vd								{:RESULT = vd;:}
-	|	functionDeclaration:fd								{:RESULT = fd;:}
+	|	functionDeclarationList:fd								{:RESULT = fd;:}
+	;
+typeDeclarationList ::= typeDeclaration:t					{:RESULT = t;:}
+	|	typeDeclaration:t typeDeclarationList:l				{:RESULT = new TypeDec(t.pos, t.name, t.ty, l);:}
 	;
 typeDeclaration ::= TYPE:ty ID:id EQ type:t					{:RESULT = new TypeDec(tyleft, Symbol.Symbol.symbol(id), t, null);:}
 	;
@@ -133,6 +140,9 @@ typeFields ::= ID:id1 COLON ID:id2							{:RESULT = new FieldList(id1left, Symbo
 	;
 variableDeclaration ::= VAR:v ID:id ASSIGN expr:e			{:RESULT = new VarDec(vleft, Symbol.Symbol.symbol(id), null, e);:}
 	|	VAR:v ID:id1 COLON ID:id2 ASSIGN expr:e				{:RESULT = new VarDec(vleft, Symbol.Symbol.symbol(id1), new NameTy(id1left, Symbol.Symbol.symbol(id2)), e);:}
+	;
+functionDeclarationList ::= functionDeclaration:f			{:RESULT = f;:}
+	|	functionDeclaration:f functionDeclarationList:l		{:RESULT = new FunctionDec(f.pos, f.name, f.params, f.result, f.body, l);:}
 	;
 functionDeclaration ::= FUNCTION:f ID:id LPAREN typeFields:tf RPAREN EQ expr:e
 															{:RESULT = new FunctionDec(fleft, Symbol.Symbol.symbol(id), tf, null, e, null);:}
