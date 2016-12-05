@@ -323,7 +323,7 @@ public class Semant {
 		if (!left.ty.coerceTo(right.ty))
 			if (!((left.ty instanceof Types.RECORD) && (right.ty instanceof Types.NIL)))
 				env.errorMsg(e.pos, "Different type between ':=' (transExp AssignExp)");
-		return right;
+		return new ExpTy(null, VOID);
 	}
 
 	ExpTy transExp(IfExp e)
@@ -345,6 +345,9 @@ public class Semant {
 					return new ExpTy(null, VOID);
 				}
 		}
+		else
+			if (!(thenclause.ty.actual() instanceof Types.VOID))
+				env.errorMsg(e.pos, "Body of then not unit! (transExp IfExp)");
 		return thenclause;
 	}
 
@@ -357,8 +360,11 @@ public class Semant {
 			return new ExpTy(null, VOID);
 		}
 		++loopNumber;
-		transExp(e.body);
+		ExpTy ty = transExp(e.body);
 		//env.errorMsg(e.pos, "WhileExp");//==================
+		//env.errorMsg(e.pos, ty.ty.toString());
+		if (!(ty.ty.actual() instanceof Types.VOID))
+			env.errorMsg(e.pos, "Body of While not unit! (transExp WhileExp)");
 		--loopNumber;
 		return new ExpTy(null, VOID);
 	}
