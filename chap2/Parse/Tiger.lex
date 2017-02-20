@@ -62,6 +62,7 @@ ws = \n|\r|\n\r|\r\n
 <YYINITIAL> "/*" {layer=1;yybegin(COMMENT);}
 <YYINITIAL> "*/" {err("Comment end but never start!");}
 <YYINITIAL> " " {}
+<YYINITIAL> "\t" {}
 <YYINITIAL> {ws} {newline();}
 <YYINITIAL> "," {return tok(sym.COMMA, null);}
 <YYINITIAL> ":" {return tok(sym.COLON, null);}
